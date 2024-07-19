@@ -1,6 +1,6 @@
-
 import mysql.connector
 from mysql.connector import Error
+
 
 class Conexion:
     _instance = None
@@ -11,7 +11,7 @@ class Conexion:
             try:
                 cls._instance.conexion = mysql.connector.connect(
                     host='localhost',
-                    port = 3306,
+                    port=3306,
                     user='root',
                     password='password123',
                     database='tienda_sura'
@@ -29,13 +29,18 @@ class Conexion:
             Conexion()
         return Conexion._instance
 
-    def execute_query(self, consulta):
+    def execute_query(self, consulta, query_type="select"):
         try:
             self.cursor.execute(consulta)
-            resultados = self.cursor.fetchall()
-            return resultados
+            if query_type == "select":
+                resultados = self.cursor.fetchall()
+                return resultados
+            else:
+                self.conexion.commit()
+                return self.cursor.rowcount
         except Error as e:
             print(f"Error al ejecutar consulta: {e}")
+            return None
 
     def disconnect(self):
         if self.conexion.is_connected():
